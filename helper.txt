@@ -1,0 +1,34 @@
+1. What “Alpha Clearance” Means
+
+Your system has security clearance levels:
+Alpha   (highest)
+Beta
+Charlie
+Delta   (lowest)
+
+Fishy:lets give them credentials like officer1 and 1234 and mention that the user is a Delta
+When he sees inventory sees can see alpha/delta data Then understands the query vulnerability.
+
+dashboards.php->inventory.php->select * query exists with condition on security clearance . We display for Delta.
+http://localhost/missile_ctf/pages/inventory.php?level=Delta this is the page that comes if they change the query parameter to alpha 
+full table comes
+""""""""""FLAG{ALPHA_CLEARANCE_GRANTED}""""""""""""
+
+2.Deleting Database for Missiles:
+1	PGlORk9dIE1pc3NpbGUgY29udHJvbCBzeXN0ZW0gaW5pdGlhbGl6ZWQ=
+2	W0lORk9dIEludmVudG9yeSBtb2R1bGUgbG9hZGVk
+3	W1dBUk5dIEJhY2t1cCBtYWludGVuYW5jZSBlbmRwb2ludCBhY2Nlc3NlZDogL3BhZ2VzL2RlbGV0ZV9taXNzaWxlcy5waHA=
+4	W0lORk9dIEhlYWx0aCBtb25pdG9yIGFjdGl2ZQ==
+
+system logs have base64 encoded messages . Candidates , have to encode and decide the right page and they need to 
+form the url and the flag will be obtained 
+
+3.Privilegde escalation attack:In admin login , just enter this and you should be logged in
+Username: ' OR 1=1 -- 
+Password: anything 
+""""""""""Admin Access Granted
+FLAG{ADMIN_PRIV_ESC}""""""""""""""""
+
+
+
+
