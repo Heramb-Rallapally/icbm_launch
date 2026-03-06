@@ -15,10 +15,7 @@ full table comes
 """"""""""FLAG{ALPHA_CLEARANCE_GRANTED}""""""""""""
 
 2.Deleting Database for Missiles:
-1	PGlORk9dIE1pc3NpbGUgY29udHJvbCBzeXN0ZW0gaW5pdGlhbGl6ZWQ=
-2	W0lORk9dIEludmVudG9yeSBtb2R1bGUgbG9hZGVk
-3	W1dBUk5dIEJhY2t1cCBtYWludGVuYW5jZSBlbmRwb2ludCBhY2Nlc3NlZDogL3BhZ2VzL2RlbGV0ZV9taXNzaWxlcy5waHA=
-4	W0lORk9dIEhlYWx0aCBtb25pdG9yIGFjdGl2ZQ==
+odd logs (1,3) is base32 and (2,4)is base64
 
 system logs have base64 encoded messages . Candidates , have to encode and decide the right page and they need to 
 form the url and the flag will be obtained 
