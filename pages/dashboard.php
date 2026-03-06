@@ -898,7 +898,7 @@ $health_pct = $health_data['Health_Percentage'];
                 <div class="big-number"><?php echo $missile_count; ?></div>
                 <p>Active Missiles Detected</p>
             </div>
-            <a href="inventory.php" class="inventory-btn">Access Inventory Database →</a>
+            <a href="inventory.php?level=Delta" class="inventory-btn">Access Inventory Database →</a>
         </div>
     </div>
 

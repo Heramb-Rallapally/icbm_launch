@@ -9,14 +9,15 @@ if(!isset($_SESSION['username'])){
 
 $user_clearance = $_SESSION['clearance'];
 
-/*
-VULNERABILITY:
-User-controlled parameter directly used in SQL query.
-No check against user's clearance.
-*/
-$level = isset($_GET['level']) ? $_GET['level'] : 'Delta';
-$query = "SELECT * FROM Missiles WHERE Classification_Level = '$level'";
-$result = mysqli_query($conn,$query);
+// If no level param in URL, redirect to ?level=Delta
+if(!isset($_GET['level'])){
+    header("Location: inventory.php?level=Delta");
+    exit();
+}
+
+$access_level = $_GET['level'];
+$query  = "SELECT * FROM Missiles WHERE Classification_Level = '$access_level'";
+$result = mysqli_query($conn, $query);
 ?>
 
 <!DOCTYPE html>
@@ -25,9 +26,7 @@ $result = mysqli_query($conn,$query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ICBM Control | Missile Inventory</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
@@ -87,8 +86,8 @@ $result = mysqli_query($conn,$query);
         }
 
         @keyframes float {
-            0%, 100% { transform: translateY(0px)   rotate(-40deg); }
-            50%       { transform: translateY(-6px)  rotate(-40deg); }
+            0%, 100% { transform: translateY(0px) rotate(-40deg); }
+            50%       { transform: translateY(-6px) rotate(-40deg); }
         }
 
         .header-logo h1 {
@@ -154,11 +153,7 @@ $result = mysqli_query($conn,$query);
             gap: 6px;
         }
 
-        .dot {
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            animation: blink 1.5s infinite;
-        }
+        .dot { width: 7px; height: 7px; border-radius: 50%; animation: blink 1.5s infinite; }
         .dot.green  { background: #2ea043; }
         .dot.red    { background: #da3633; animation-delay: 0.5s; }
         .dot.yellow { background: #e3b341; animation-delay: 1s; }
@@ -176,6 +171,9 @@ $result = mysqli_query($conn,$query);
 
         .page-title {
             margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
         .page-title h2 {
@@ -191,6 +189,36 @@ $result = mysqli_query($conn,$query);
             letter-spacing: 2px;
             margin-top: 4px;
         }
+
+        /* ── URL hint box ── */
+        .url-hint {
+            position: relative;
+            background: rgba(10,14,23,0.92);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 4px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            font-size: 0.75rem;
+            color: #8b949e;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .url-hint::before,
+        .url-hint::after {
+            content: '';
+            position: absolute;
+            width: 10px; height: 10px;
+            border-color: #58a6ff;
+            border-style: solid;
+        }
+        .url-hint::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+        .url-hint::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+        .url-hint span { color: #58a6ff; }
+        .url-hint b    { color: #e3b341; }
 
         /* ── Table Card ── */
         .table-card {
@@ -230,11 +258,7 @@ $result = mysqli_query($conn,$query);
 
         .table-wrap { overflow-x: auto; }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8rem;
-        }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
 
         thead th {
             background: #0d1117;
@@ -278,7 +302,8 @@ $result = mysqli_query($conn,$query);
 
         .flag-row td {
             background: rgba(218,54,51,0.08) !important;
-            border: 1px dashed rgba(218,54,51,0.5) !important;
+            border-top: 1px dashed rgba(218,54,51,0.5) !important;
+            border-bottom: 1px dashed rgba(218,54,51,0.5) !important;
             color: #da3633 !important;
             text-align: center;
             font-weight: bold;
@@ -321,7 +346,6 @@ $result = mysqli_query($conn,$query);
             0%   { transform: translateX(100vw); }
             100% { transform: translateX(-100%); }
         }
-
     </style>
 </head>
 <body>
@@ -348,27 +372,33 @@ $result = mysqli_query($conn,$query);
 <div class="status-bar">
     <div class="status-item"><div class="dot green"></div> Database Online</div>
     <div class="status-item"><div class="dot red"></div> Threat Level: HIGH</div>
-    <div class="status-item"><div class="dot yellow"></div> Total Records: <?php echo mysqli_num_rows($result); ?></div>
+    <div class="status-item"><div class="dot yellow"></div> Access Level: <?php echo htmlspecialchars($access_level); ?></div>
     <div class="status-item"><div class="dot green"></div> Your Clearance: <?php echo htmlspecialchars($user_clearance); ?></div>
 </div>
 
 <div class="main-content">
 
     <div class="page-title">
-        <h2>🗄 Missile Inventory</h2>
-        <p>Full missile registry — all classification levels</p>
+        <div>
+            <h2>🗄 Missile Inventory</h2>
+            <p>Access restricted by clearance level — current filter: <?php echo htmlspecialchars($access_level); ?></p>
+        </div>
     </div>
+
+    <!-- URL hint -->
+    
 
     <div class="table-card">
         <div class="table-header">
             <span>📋 Missile Records</span>
-            <span><?php echo mysqli_num_rows($result); ?> Records Found</span>
+            <span>Access Level: <?php echo htmlspecialchars($access_level); ?></span>
         </div>
         <div class="table-wrap">
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
+                        
                         <th>Type</th>
                         <th>Range (km)</th>
                         <th>Fuel</th>
@@ -420,7 +450,7 @@ $result = mysqli_query($conn,$query);
                         <td colspan="7">
                             <div class="empty-state">
                                 <div class="empty-icon">🔒</div>
-                                <p>NO MISSILE RECORDS FOUND</p>
+                                <p>NO RECORDS FOUND FOR ACCESS LEVEL: <?php echo strtoupper($access_level); ?></p>
                             </div>
                         </td>
                     </tr>
@@ -436,6 +466,7 @@ $result = mysqli_query($conn,$query);
 <div class="ticker-wrap">
     <span class="ticker">
         &nbsp;&nbsp;&nbsp; ⚠ ALERT: UNAUTHORIZED ACCESS DETECTED IN SECTOR 7 &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+        ACCESS LEVEL FILTER: <?php echo strtoupper($access_level); ?> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
         OPERATOR CLEARANCE: <?php echo strtoupper($user_clearance); ?> &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
         MISSILE DATABASE ACTIVE — HANDLE WITH CARE &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
         CTF CHALLENGE ACTIVE — FIND ALL FLAGS TO WIN &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
